@@ -17,11 +17,9 @@ export default function Home() {
         dotColor="#ffffff11"
       /> */}
 
-      <div className=" items-center justify-items-center p-20 pb-6 gap-4  font-[family-name:var(--font-geist-sans)]">
+      <div className=" items-center justify-items-center p-20 pb-6 print:p-0 print:pb-0 gap-4 font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-          <Board
-            id={boardId}
-            className="w-[297mm] h-[210mm] bg-white shadow-2xl">
+          <Board id={boardId} className="w-[297mm] h-[210mm]">
             <GridBackground
               elementId={boardId}
               size={16}
@@ -30,7 +28,6 @@ export default function Home() {
               secondaryColor={'#00000011'}
               dotColor={'#0000000f'}
             />
-            dae
           </Board>
         </main>
         <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">

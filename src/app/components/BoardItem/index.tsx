@@ -1,5 +1,6 @@
+import { MoveIcon } from '@radix-ui/react-icons';
 import clsx from 'clsx';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ChangeEvent, ChangeEventHandler, useState } from 'react';
 
 export interface BoardItemProps {
@@ -29,6 +30,8 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
     content: 'content',
   });
 
+  const [isHovering, setHovering] = useState(false);
+
   const handleTitleChange: ChangeEventHandler<HTMLInputElement> = (
     event: ChangeEvent<HTMLInputElement>
   ) => {
@@ -43,9 +46,7 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
 
   return (
     <motion.div
-      className={clsx(
-        'flex absolute border border-cyan-800/40 rounded-sm p-2 bg-white resize'
-      )}
+      className={clsx('absolute')}
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{
@@ -57,15 +58,35 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
         top: `${data.top}px`,
         width: `${data.width}px`,
         height: `${data.height}px`,
-      }}>
-      <div className={clsx('flex flex-col gap-2 w-[100%]')}>
+      }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}>
+      <AnimatePresence initial={false}>
+        {isHovering ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
+            className="absolute top-[-2rem] left-0 w-[100%] h-[2rem] flex justify-center">
+            <div className="border border-slate-100 border-b-0 px-4 p-2 text-gray-700 shadow-md bg-white rounded-t-md">
+              <div>
+                <MoveIcon />
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+      <div
+        className={clsx(
+          'flex flex-col w-[100%] h-[100%] absolute  p-4 gap-2 bg-white resize shadow-lg'
+        )}>
         <input
           type="text"
           defaultValue={data.title}
           onChange={handleTitleChange}
           onDoubleClick={(e) => e.stopPropagation()}
           className={clsx(
-            'text-slate-950 border-none ring-none outline-none text-[1.5rem]'
+            'text-slate-950 border-none ring-none outline-none text-[1.5rem] font-bold'
           )}
         />
         <textarea
