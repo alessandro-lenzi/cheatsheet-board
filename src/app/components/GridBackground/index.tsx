@@ -6,6 +6,7 @@ interface GenerateProps {
   size: number;
   primaryColor: string;
   secondaryColor: string;
+  dotColor: string;
   stops: number;
 }
 
@@ -14,6 +15,7 @@ function generateGrid({
   stops,
   primaryColor,
   secondaryColor,
+  dotColor,
 }: GenerateProps) {
   console.log(
     `generateGrid(${size}, ${stops}, ${primaryColor}, ${secondaryColor})`
@@ -69,6 +71,23 @@ function generateGrid({
     }
   }
 
+  ctx.fillStyle = dotColor;
+  ctx.beginPath();
+  ctx.arc(0, 0, 1, 0, 360);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(0, totalSize - 1, 1, 0, 360);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(totalSize - 1, 0, 1, 0, 360);
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(totalSize - 1, totalSize - 1, 1, 0, 360);
+  ctx.fill();
+
   return canvas.toDataURL('image/png');
 }
 
@@ -78,13 +97,14 @@ interface IProps {
   stops: number;
   primaryColor: string;
   secondaryColor: string;
+  dotColor: string;
 }
 
 export const GridBackground = ({ elementId, ...props }: IProps) => {
   useEffect(() => {
     const grid = generateGrid(props);
 
-    const element = document.querySelector<HTMLDivElement>(`#${elementId}`);
+    const element = document.getElementById(elementId);
     if (element) {
       console.log('element found, setting grid to ', grid);
       element.style.backgroundImage = `url(${grid})`;

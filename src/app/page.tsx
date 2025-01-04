@@ -1,11 +1,37 @@
 import { GridBackground } from '@/app/components/GridBackground';
+import { useId } from 'react';
+import { Board } from './components/Board';
 
 export default function Home() {
+  const wrapperId = useId();
+  const boardId = useId();
+
   return (
-    <div id="gridWrapper" className="w-[100vw] h-[100vh]">
-      <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div id={wrapperId} className="w-[100%] h-[100%]">
+      {/* <GridBackground
+        elementId={wrapperId}
+        size={16}
+        stops={3}
+        primaryColor="#ffffff22"
+        secondaryColor="#33333333"
+        dotColor="#ffffff11"
+      /> */}
+
+      <div className=" items-center justify-items-center p-20 pb-6 gap-4  font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-          Welcome
+          <Board
+            id={boardId}
+            className="w-[297mm] h-[210mm] bg-white shadow-2xl">
+            <GridBackground
+              elementId={boardId}
+              size={16}
+              stops={3}
+              primaryColor={'#00000033'}
+              secondaryColor={'#00000011'}
+              dotColor={'#0000000f'}
+            />
+            dae
+          </Board>
         </main>
         <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
           {/* <a
@@ -52,13 +78,6 @@ export default function Home() {
           </a> */}
         </footer>
       </div>
-      <GridBackground
-        elementId="gridWrapper"
-        size={16}
-        stops={3}
-        primaryColor={'#ffffff22'}
-        secondaryColor={'#33333333'}
-      />
     </div>
   );
 }
