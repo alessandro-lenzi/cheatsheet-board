@@ -1,0 +1,97 @@
+'use client';
+
+import { useEffect } from 'react';
+
+interface GenerateProps {
+  size: number;
+  primaryColor: string;
+  secondaryColor: string;
+  stops: number;
+}
+
+function generateGrid({
+  size,
+  stops,
+  primaryColor,
+  secondaryColor,
+}: GenerateProps) {
+  console.log(
+    `generateGrid(${size}, ${stops}, ${primaryColor}, ${secondaryColor})`
+  );
+
+  const canvas = document.createElement('canvas');
+
+  const totalSize = size * (stops + 1);
+  canvas.width = totalSize;
+  canvas.height = totalSize;
+  console.log(`totalSize is ${totalSize}`);
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    console.warn('Not possible to get 2d context');
+    return '';
+  }
+
+  ctx.beginPath();
+  // Primary lines
+  // - Vertical
+  ctx.moveTo(totalSize, 0);
+  ctx.lineTo(totalSize, totalSize);
+  // - Horizontal
+  ctx.moveTo(0, totalSize);
+  ctx.lineTo(totalSize, totalSize);
+
+  // ctx.strokeStyle = 'red';
+  ctx.strokeStyle = primaryColor;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Secondary lines
+  if (stops >= 1) {
+    // const blockSize = size;
+    for (let i = 1; i <= stops; i++) {
+      const pos = size * i;
+      console.log(`drawing stop [${i}] at pos=${pos}`);
+
+      ctx.beginPath();
+
+      // - Vertical
+      ctx.moveTo(pos, 0);
+      ctx.lineTo(pos, totalSize);
+
+      // - Horizontal
+      ctx.moveTo(0, pos);
+      ctx.lineTo(totalSize, pos);
+
+      ctx.strokeStyle = secondaryColor;
+      // ctx.strokeStyle = 'green';
+      ctx.stroke();
+    }
+  }
+
+  return canvas.toDataURL('image/png');
+}
+
+interface IProps {
+  elementId: string;
+  size: number;
+  stops: number;
+  primaryColor: string;
+  secondaryColor: string;
+}
+
+export const GridBackground = ({ elementId, ...props }: IProps) => {
+  useEffect(() => {
+    const grid = generateGrid(props);
+
+    const element = document.querySelector<HTMLDivElement>(`#${elementId}`);
+    if (element) {
+      console.log('element found, setting grid to ', grid);
+      element.style.backgroundImage = `url(${grid})`;
+    } else {
+      console.log('element not found,');
+    }
+  }, []);
+
+  return null;
+};
