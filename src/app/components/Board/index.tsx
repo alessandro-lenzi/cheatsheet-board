@@ -36,7 +36,9 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
   const handleDoubleClick: MouseEventHandler<HTMLDivElement> = (
     event: MouseEvent<HTMLDivElement>
   ) => {
-    console.log(event);
+    console.log(
+      `Creating new board item at X=${event.nativeEvent.layerX} Y=${event.nativeEvent.layerY}`
+    );
 
     const newItem = (
       <BoardItem
