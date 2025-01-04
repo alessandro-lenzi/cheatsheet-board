@@ -64,9 +64,11 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
       <AnimatePresence initial={false}>
         {isHovering ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0 }}
+            initial={{ opacity: 0, top: 0 }}
+            animate={{ opacity: 1, top: '-2rem' }}
+            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, top: 0 }}
+            onDoubleClick={(e) => e.stopPropagation()}
             className="absolute top-[-2rem] left-0 w-[100%] h-[2rem] flex justify-center">
             <div className="border border-slate-100 border-b-0 px-4 p-2 text-gray-700 shadow-md bg-white rounded-t-md">
               <div>
@@ -79,7 +81,8 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
       <div
         className={clsx(
           'flex flex-col w-[100%] h-[100%] absolute  p-4 gap-2 bg-white resize shadow-lg'
-        )}>
+        )}
+        onDoubleClick={(e) => e.stopPropagation()}>
         <input
           type="text"
           defaultValue={data.title}

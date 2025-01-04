@@ -54,7 +54,7 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
       ref={refCallback}
       {...props}
       className={`${className} ${clsx(
-        'relative select-none bg-stone-100 shadow-2xl print:p-0 print:pb-0 print:shadow-none print:border'
+        'relative select-none bg-stone-100 shadow-2xl print:p-0 print:pb-0 print:shadow-none contain-paint'
       )}`}
       onDoubleClick={handleDoubleClick}>
       {children}
