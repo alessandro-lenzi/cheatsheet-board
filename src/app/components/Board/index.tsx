@@ -20,7 +20,7 @@ type IProps = HTMLAttributes<HTMLDivElement> & {
 
 export const Board = ({ ref, children, className, ...props }: IProps) => {
   const [items, setItems] = useState<ReactElement<BoardItemProps>[]>([
-    <BoardItem key="1" x={250} y={250} />,
+    <BoardItem key="1" x={256} y={256} />,
   ]);
 
   function refCallback(element: HTMLDivElement | null) {

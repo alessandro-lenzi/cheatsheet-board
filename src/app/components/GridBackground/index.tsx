@@ -53,7 +53,6 @@ function generateGrid({
     // const blockSize = size;
     for (let i = 1; i <= stops; i++) {
       const pos = size * i;
-      console.log(`drawing stop [${i}] at pos=${pos}`);
 
       ctx.beginPath();
 
