@@ -108,7 +108,8 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
         height: `${data.height}px`,
       }}
       onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}>
+      onMouseLeave={() => setHovering(false)}
+    >
       <AnimatePresence initial={false}>
         {isHovering || isDragging ? (
           <motion.div
@@ -117,13 +118,15 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
             transition={{ duration: 0.2 }}
             exit={{ opacity: 0, top: 0 }}
             onDoubleClick={(e) => e.stopPropagation()}
-            className="absolute top-[-2rem] left-0 w-[100%] h-[2rem] flex justify-center">
-            <div className=" p-1 text-gray-300 hover:text-gray-800 shadow-md bg-white rounded-t-md">
+            className="absolute left-0 top-[-2rem] flex h-[2rem] w-[100%] justify-center"
+          >
+            <div className="rounded-t-md bg-white p-1 text-gray-300 shadow-md hover:text-gray-800">
               <div
-                className={clsx(' transition-all rounded-md p-1 px-10', {
+                className={clsx('rounded-md p-1 px-10 transition-all', {
                   'bg-gray-100': isDragging,
                 })}
-                onMouseDown={startDragging}>
+                onMouseDown={startDragging}
+              >
                 <MoveIcon />
               </div>
             </div>
@@ -132,16 +135,17 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
       </AnimatePresence>
       <div
         className={clsx(
-          'flex flex-col w-[100%] h-[100%] absolute  p-4 gap-2 bg-white resize shadow-lg'
+          'absolute flex h-[100%] w-[100%] resize flex-col gap-2 bg-white p-4 shadow-lg'
         )}
-        onDoubleClick={(e) => e.stopPropagation()}>
+        onDoubleClick={(e) => e.stopPropagation()}
+      >
         <input
           type="text"
           defaultValue={data.title}
           onChange={handleTitleChange}
           onDoubleClick={(e) => e.stopPropagation()}
           className={clsx(
-            'text-slate-950 border-none ring-none outline-none text-[1.5rem] font-bold'
+            'ring-none border-none text-[1.5rem] font-bold text-slate-950 outline-none'
           )}
         />
         <textarea
@@ -149,7 +153,7 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
           onChange={handleContentChange}
           onDoubleClick={(e) => e.stopPropagation()}
           className={clsx(
-            'flex-1 resize-none border-none ring-none outline-none text-slate-950 text-[1.2rem]'
+            'ring-none flex-1 resize-none border-none text-[1.2rem] text-slate-950 outline-none'
           )}
         />
       </div>

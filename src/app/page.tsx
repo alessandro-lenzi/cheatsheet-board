@@ -7,7 +7,7 @@ export default function Home() {
   const boardId = useId();
 
   return (
-    <div id={wrapperId} className="w-[100%] h-[100%]">
+    <div id={wrapperId} className="h-[100%] w-[100%]">
       {/* <GridBackground
         elementId={wrapperId}
         size={16}
@@ -17,9 +17,9 @@ export default function Home() {
         dotColor="#ffffff11"
       /> */}
 
-      <div className=" items-center justify-items-center p-20 pb-6 print:p-0 print:pb-0 gap-4 font-[family-name:var(--font-geist-sans)]">
-        <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-          <Board id={boardId} className="w-[297mm] h-[210mm]">
+      <div className="items-center justify-items-center gap-4 p-20 pb-6 font-[family-name:var(--font-geist-sans)] print:p-0 print:pb-0">
+        <main className="row-start-2 flex flex-col items-center gap-8 sm:items-start">
+          <Board id={boardId} className="h-[210mm] w-[297mm]">
             <GridBackground
               elementId={boardId}
               size={16}
@@ -30,7 +30,7 @@ export default function Home() {
             />
           </Board>
         </main>
-        <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+        <footer className="row-start-3 flex flex-wrap items-center justify-center gap-6">
           {/* <a
             className="flex items-center gap-2 hover:underline hover:underline-offset-4"
             href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
