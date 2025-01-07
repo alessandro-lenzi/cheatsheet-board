@@ -1,6 +1,5 @@
-import { MoveIcon } from '@radix-ui/react-icons';
-import clsx from 'clsx';
-import { AnimatePresence, motion } from 'motion/react';
+'use client';
+
 import {
   ChangeEvent,
   ChangeEventHandler,
@@ -10,6 +9,22 @@ import {
   useRef,
   useId,
 } from 'react';
+
+import clsx from 'clsx';
+import { AnimatePresence, motion } from 'motion/react';
+import { MoveIcon } from '@radix-ui/react-icons';
+
+import { textColorForBg } from '@/util/color';
+
+// import { Editor } from 'prism-react-editor';
+// import { BasicSetup } from 'prism-react-editor/setups';
+// import 'prism-react-editor/prism/languages/tsx';
+// import 'prism-react-editor/prism/languages/jsx';
+// import 'prism-react-editor/layout.css';
+// import 'prism-react-editor/scrollbar.css';
+// import 'prism-react-editor/themes/github-light.css';
+// import 'prism-react-editor/search.css';
+import { CodeEditor } from '../CodeEditor';
 
 export interface BoardItemProps {
   x: number;
@@ -22,7 +37,8 @@ interface ItemData {
   width: number;
   height: number;
   title: string;
-  content: string;
+  content?: string;
+  color: string;
 }
 
 const InitialWidth = 200;
@@ -73,8 +89,14 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
     top: y - InitialHeight / 2,
     width: InitialWidth,
     height: InitialHeight,
-    title: 'title',
-    content: 'content',
+    title: '',
+    content: `const a = 123;
+
+function sum(b:number) {
+  return \`Sum: \$\{a + b} \`;
+}
+`,
+    color: '#464f6f',
   });
 
   const titleId = useId();
@@ -88,54 +110,11 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
     setData({ ...data, title: event.target.value });
   };
 
-  const handleContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
-    event: ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    setData({ ...data, content: event.target.value });
-  };
-
-  // let previousX = 0;
-  // let previousY = 0;
-
-  // const startDragging: MouseEventHandler<HTMLDivElement> = (
-  //   e: MouseEvent<HTMLDivElement>
+  // const handleContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
+  //   event: ChangeEvent<HTMLTextAreaElement>
   // ) => {
-  //   // e.preventDefault();
-  //   setDragging(true);
-
-  //   previousX = e.clientX;
-  //   previousY = e.clientY;
-
-  //   document.onmouseup = () => {
-  //     document.onmouseup = null;
-  //     document.onmousemove = null;
-  //     setDragging(false);
-  //   };
-
-  //   document.onmousemove = (e) => {
-  //     e.preventDefault();
-
-  //     const incrementX = previousX - e.clientX;
-  //     const incrementY = previousY - e.clientY;
-  //     const truncX = e.shiftKey ? incrementX % 16 : 0;
-  //     const truncY = e.shiftKey ? incrementY % 16 : 0;
-
-  //     const newLeft = ref.current!.offsetLeft - incrementX;
-  //     const newTop = ref.current!.offsetTop - incrementY;
-
-  //     setData({
-  //       ...data,
-  //       left: newLeft + truncX,
-  //       top: newTop + truncY,
-  //     });
-
-  //     previousX = e.clientX + truncX;
-  //     previousY = e.clientY + truncY;
-  //   };
+  //   setData({ ...data, content: event.target.value });
   // };
-  // const unfocus = useCallback(() => {
-  //   if (isTransformEnabled) setTransform(false);
-  // }, [isTransformEnabled]);
 
   const disableTransform = () => {
     setTransform(false);
@@ -150,6 +129,7 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
   };
 
   const [mouseDownAt, setMouseDownAt] = useState(0);
+  const [mouseUpAt, setMouseUpAt] = useState(0);
 
   const startDragging = getDraggingHandler(
     (incrementX, incrementY) => {
@@ -242,7 +222,9 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
   return (
     <motion.div
       ref={ref}
-      className={clsx('group absolute focus-within:ring-1')}
+      className={clsx(
+        'sheet-item group absolute rounded-md focus-within:z-30 focus-within:ring-2'
+      )}
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}
@@ -263,7 +245,10 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
             animate={{ opacity: 1, top: '-2rem' }}
             transition={{ duration: 0.2 }}
             exit={{ opacity: 0, top: 0 }}
-            onDoubleClick={(e) => e.stopPropagation()}
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              console.log('double click, stopping propagation');
+            }}
             className="no-print absolute left-0 top-[-2rem] flex h-[2rem] w-[100%] justify-center"
           >
             <div className="rounded-t-md bg-white p-1 text-gray-300 shadow-md hover:text-gray-800">
@@ -287,15 +272,27 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
         )}
         onDoubleClick={(e) => {
           e.stopPropagation();
-          document.getElementById(titleId)?.focus();
-          disableTransform();
+          // document.getElementById(titleId)?.focus();
+          // disableTransform();
         }}
         onMouseDown={startDragging}
         onMouseUp={(e) => {
           e.stopPropagation();
+          console.log('up');
 
           const now = new Date().getTime();
-          if (now - mouseDownAt < 200) {
+          setMouseUpAt(now);
+          if (now - mouseUpAt < 300) {
+            console.log('aqui');
+            document.getElementById(titleId)?.focus();
+
+            if (isTransformEnabled) disableTransform();
+            return;
+          }
+
+          if (!isTransformEnabled && now - mouseDownAt < 200) {
+            // This means its a short click, so it's not a dragging action
+            // but just a click action, and we can enable the transform controls
             enableTransform();
           }
         }}
@@ -305,7 +302,7 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
       {isTransformEnabled ? (
         <div
           className={clsx(
-            'no-print absolute inset-[-6px] border border-dashed border-slate-400'
+            'no-print absolute inset-[-6px] z-20 border border-dashed border-slate-400'
           )}
         >
           {/* Top left */}
@@ -345,29 +342,35 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
       {/* )} */}
       <div
         className={clsx(
-          'absolute flex h-[100%] w-[100%] resize flex-col gap-2 bg-white p-2 shadow-lg'
+          `absolute z-0 flex h-[100%] w-[100%] resize flex-col gap-1 rounded-md p-1 shadow-lg`
         )}
-        onDoubleClick={(e) => e.stopPropagation()}
+        // style={{ backgroundColor: '#ffb4ff' }}
+        style={{ backgroundColor: data.color }}
+        onDoubleClick={(e) => {
+          console.log('dae2');
+          e.stopPropagation();
+        }}
       >
         <input
           id={titleId}
           type="text"
           defaultValue={data.title}
+          placeholder="Title"
           onChange={handleTitleChange}
-          onDoubleClick={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => {
+            e.stopPropagation();
+          }}
           onClick={(e) => e.stopPropagation()}
+          style={{ color: textColorForBg(data.color) }}
           className={clsx(
-            'ring-none border-none p-1 text-[1.5rem] font-bold text-slate-950 outline-none group-focus-within:bg-slate-100'
+            'ring-none rounded-md border-none bg-transparent p-1 text-[1.5rem] font-bold outline-none placeholder:text-white/70'
           )}
         />
-        <textarea
-          defaultValue={data.content}
-          onChange={handleContentChange}
-          onDoubleClick={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-          className={clsx(
-            'ring-none flex-1 resize-none border-none p-1 text-[1.2rem] text-slate-950 outline-none group-focus-within:bg-slate-100'
-          )}
+
+        <CodeEditor
+          language="tsx"
+          value={data.content}
+          // onChange={(value) => setData({ ...data, content: value })}
         />
       </div>
     </motion.div>

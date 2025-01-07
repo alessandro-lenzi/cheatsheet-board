@@ -17,25 +17,22 @@ function generateGrid({
   secondaryColor,
   dotColor,
 }: GenerateProps) {
-  console.log(
-    `generateGrid(${size}, ${stops}, ${primaryColor}, ${secondaryColor})`
-  );
-
   const canvas = document.createElement('canvas');
 
   const totalSize = size * (stops + 1);
   canvas.width = totalSize;
   canvas.height = totalSize;
-  console.log(`totalSize is ${totalSize}`);
 
   const ctx = canvas.getContext('2d');
   if (!ctx) {
-    console.warn('Not possible to get 2d context');
+    console.warn('Not possible to get 2d context for grid background.');
     return '';
   }
 
-  ctx.beginPath();
   // Primary lines
+  ctx.beginPath();
+  ctx.strokeStyle = primaryColor;
+  ctx.lineWidth = 1;
   // - Vertical
   ctx.moveTo(totalSize, 0);
   ctx.lineTo(totalSize, totalSize);
@@ -43,9 +40,6 @@ function generateGrid({
   ctx.moveTo(0, totalSize);
   ctx.lineTo(totalSize, totalSize);
 
-  // ctx.strokeStyle = 'red';
-  ctx.strokeStyle = primaryColor;
-  ctx.lineWidth = 1;
   ctx.stroke();
 
   // Secondary lines
@@ -65,7 +59,6 @@ function generateGrid({
       ctx.lineTo(totalSize, pos);
 
       ctx.strokeStyle = secondaryColor;
-      // ctx.strokeStyle = 'green';
       ctx.stroke();
     }
   }
@@ -105,10 +98,9 @@ export const GridBackground = ({ elementId, ...props }: IProps) => {
 
     const element = document.getElementById(elementId);
     if (element) {
-      console.log('element found, setting grid to ', grid);
       element.style.backgroundImage = `url(${grid})`;
     } else {
-      console.log('element not found,');
+      console.warn('Element not found for grid background.');
     }
   }, []);
 

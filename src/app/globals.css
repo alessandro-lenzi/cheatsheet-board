@@ -20,6 +20,14 @@
     margin: 0mm;
   }
 
+  .sheet-board {
+    background: white !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   nextjs-portal,
   .no-print {
     display: none !important;

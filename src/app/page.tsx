@@ -1,3 +1,4 @@
+'use client';
 import { GridBackground } from '@/app/components/GridBackground';
 import { useId } from 'react';
 import { Board } from './components/Board';
