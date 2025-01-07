@@ -52,17 +52,9 @@ interface IProps {
 }
 
 // Work around to make the custom font work properly
-type OmittedTextareaProps =
-  | 'ref'
-  | 'autoFocus'
-  | 'value'
-  | 'defaultValue'
-  | 'className'
-  | 'cols'
-  | 'rows';
 type TextAreaProps = Omit<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
-  OmittedTextareaProps
+  'className'
 >;
 const textareaProps = {
   className: MonaspaceKrypton.className,

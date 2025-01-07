@@ -11,19 +11,8 @@ import {
 } from 'react';
 
 import clsx from 'clsx';
-import { AnimatePresence, motion } from 'motion/react';
-import { MoveIcon } from '@radix-ui/react-icons';
+import { motion } from 'motion/react';
 
-import { textColorForBg } from '@/util/color';
-
-// import { Editor } from 'prism-react-editor';
-// import { BasicSetup } from 'prism-react-editor/setups';
-// import 'prism-react-editor/prism/languages/tsx';
-// import 'prism-react-editor/prism/languages/jsx';
-// import 'prism-react-editor/layout.css';
-// import 'prism-react-editor/scrollbar.css';
-// import 'prism-react-editor/themes/github-light.css';
-// import 'prism-react-editor/search.css';
 import { CodeEditor } from '../CodeEditor';
 
 export interface BoardItemProps {
@@ -46,6 +35,7 @@ const InitialHeight = 200;
 
 let prevX = 0;
 let prevY = 0;
+
 const getDraggingHandler: (
   updateCallback: (incrementX: number, incrementY: number) => void,
   onStart?: () => void,
@@ -54,7 +44,6 @@ const getDraggingHandler: (
   return (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    // setDrag(true);
     if (onStart) onStart();
 
     prevX = e.clientX;
@@ -63,7 +52,6 @@ const getDraggingHandler: (
     document.onmouseup = () => {
       document.onmouseup = null;
       document.onmousemove = null;
-      // setDrag(false);
       if (onStop) onStop();
     };
 
@@ -92,7 +80,7 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
     title: '',
     content: `const a = 123;
 
-function sum(b:number) {
+function sum(b: number) {
   return \`Sum: \$\{a + b} \`;
 }
 `,
@@ -102,7 +90,7 @@ function sum(b:number) {
   const titleId = useId();
 
   const [isTransformEnabled, setTransform] = useState(false);
-  const [isHovering, setHovering] = useState(false);
+  // const [isHovering, setHovering] = useState(false);
 
   const handleTitleChange: ChangeEventHandler<HTMLInputElement> = (
     event: ChangeEvent<HTMLInputElement>
@@ -223,7 +211,9 @@ function sum(b:number) {
     <motion.div
       ref={ref}
       className={clsx(
-        'sheet-item group absolute rounded-md focus-within:z-30 focus-within:ring-2'
+        'sheet-item group absolute rounded-md focus-within:z-30 focus-within:ring-2',
+        'shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_8px_20px_-6px_rgba(0,0,0,0.3)]'
+        // 'shadow-lg'
       )}
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -234,11 +224,11 @@ function sum(b:number) {
         width: `${data.width}px`,
         height: `${data.height}px`,
       }}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      // onMouseEnter={() => setHovering(true)}
+      // onMouseLeave={() => setHovering(false)}
       onClick={(e) => e.stopPropagation()}
     >
-      <AnimatePresence initial={false}>
+      {/* <AnimatePresence initial={false}>
         {isHovering ? (
           <motion.div
             initial={{ opacity: 0, top: 0 }}
@@ -263,7 +253,7 @@ function sum(b:number) {
             </div>
           </motion.div>
         ) : null}
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* Focus clickable wrapper */}
       <div
@@ -278,12 +268,10 @@ function sum(b:number) {
         onMouseDown={startDragging}
         onMouseUp={(e) => {
           e.stopPropagation();
-          console.log('up');
 
           const now = new Date().getTime();
           setMouseUpAt(now);
           if (now - mouseUpAt < 300) {
-            console.log('aqui');
             document.getElementById(titleId)?.focus();
 
             if (isTransformEnabled) disableTransform();
@@ -342,12 +330,11 @@ function sum(b:number) {
       {/* )} */}
       <div
         className={clsx(
-          `absolute z-0 flex h-[100%] w-[100%] resize flex-col gap-1 rounded-md p-1 shadow-lg`
+          `absolute z-0 flex h-[100%] w-[100%] resize flex-col gap-1 rounded-md border border-black/20 p-1`
         )}
-        // style={{ backgroundColor: '#ffb4ff' }}
-        style={{ backgroundColor: data.color }}
+        style={{ backgroundColor: 'white' }}
+        // style={{ backgroundColor: data.color }}
         onDoubleClick={(e) => {
-          console.log('dae2');
           e.stopPropagation();
         }}
       >
@@ -361,9 +348,10 @@ function sum(b:number) {
             e.stopPropagation();
           }}
           onClick={(e) => e.stopPropagation()}
-          style={{ color: textColorForBg(data.color) }}
+          // style={{ color: textColorForBg(data.color) }}
+          style={{ color: 'black' }}
           className={clsx(
-            'ring-none rounded-md border-none bg-transparent p-1 text-[1.5rem] font-bold outline-none placeholder:text-white/70'
+            'ring-none rounded-md border-none bg-transparent p-2 px-3 text-[1.5rem] font-bold outline-none placeholder:text-black/70'
           )}
         />
 
