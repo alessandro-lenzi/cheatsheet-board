@@ -3,8 +3,6 @@
 import {
   ChangeEvent,
   ChangeEventHandler,
-  MouseEventHandler,
-  MouseEvent,
   useState,
   useRef,
   useId,
@@ -14,6 +12,7 @@ import clsx from 'clsx';
 import { motion } from 'motion/react';
 
 import { CodeEditor } from '../CodeEditor';
+import { getDraggingHandler } from '@/util/dragHandler';
 
 export interface BoardItemProps {
   x: number;
@@ -25,51 +24,14 @@ interface ItemData {
   top: number;
   width: number;
   height: number;
-  title: string;
+  title?: string;
   content?: string;
+  initialContent: string;
   color: string;
 }
 
 const InitialWidth = 200;
 const InitialHeight = 200;
-
-let prevX = 0;
-let prevY = 0;
-
-const getDraggingHandler: (
-  updateCallback: (incrementX: number, incrementY: number) => void,
-  onStart?: () => void,
-  onStop?: () => void
-) => MouseEventHandler<HTMLDivElement> = (updateCallback, onStart, onStop) => {
-  return (e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onStart) onStart();
-
-    prevX = e.clientX;
-    prevY = e.clientY;
-
-    document.onmouseup = () => {
-      document.onmouseup = null;
-      document.onmousemove = null;
-      if (onStop) onStop();
-    };
-
-    document.onmousemove = (e) => {
-      e.preventDefault();
-
-      const incrementX = prevX - e.clientX;
-      const incrementY = prevY - e.clientY;
-      const truncX = e.shiftKey ? incrementX % 16 : 0;
-      const truncY = e.shiftKey ? incrementY % 16 : 0;
-
-      updateCallback(incrementX - truncX, incrementY - truncY);
-
-      prevX = e.clientX + truncX;
-      prevY = e.clientY + truncY;
-    };
-  };
-};
 
 export const BoardItem = ({ x, y }: BoardItemProps) => {
   const [data, setData] = useState<ItemData>({
@@ -77,11 +39,10 @@ export const BoardItem = ({ x, y }: BoardItemProps) => {
     top: y - InitialHeight / 2,
     width: InitialWidth,
     height: InitialHeight,
-    title: '',
-    content: `const a = 123;
+    initialContent: `const a = 123;
 
 function sum(b: number) {
-  return \`Sum: \$\{a + b} \`;
+  return \`Sum: \$\{a + b}\`;
 }
 `,
     color: '#464f6f',
@@ -255,6 +216,10 @@ function sum(b: number) {
         ) : null}
       </AnimatePresence> */}
 
+      <div className="no-print border-gold absolute bottom-0 right-1 z-10 p-1 text-[0.7em] text-slate-500">
+        W: {data.width} H: {data.height} X: {data.left} Y: {data.top}
+      </div>
+
       {/* Focus clickable wrapper */}
       <div
         className={clsx(
@@ -357,8 +322,8 @@ function sum(b: number) {
 
         <CodeEditor
           language="tsx"
-          value={data.content}
-          // onChange={(value) => setData({ ...data, content: value })}
+          defaultValue={data.initialContent ?? ''}
+          onChange={(value) => setData({ ...data, content: value })}
         />
       </div>
     </motion.div>

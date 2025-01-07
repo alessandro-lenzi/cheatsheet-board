@@ -46,7 +46,7 @@ const Extensions = ({ editor }: { editor: PrismEditor }) => {
 };
 
 interface IProps {
-  value?: string;
+  defaultValue?: string;
   onChange?: (value: string) => void;
   language?: string;
 }
@@ -60,11 +60,11 @@ const textareaProps = {
   className: MonaspaceKrypton.className,
 } as TextAreaProps;
 
-export function CodeEditor({ language, value, onChange }: IProps) {
+export function CodeEditor({ language, defaultValue, onChange }: IProps) {
   return (
     <Editor
       language={language ?? 'tsx'}
-      value={value ?? ''}
+      value={defaultValue ?? ''}
       onUpdate={onChange}
       insertSpaces={false}
       lineNumbers={false}
