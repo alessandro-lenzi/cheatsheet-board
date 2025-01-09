@@ -69,10 +69,6 @@ function sum(b: number) {
     setData({ ...data, content: value });
   };
 
-  const disableTransform = () => {
-    setTransform(false);
-  };
-
   const enableTransform = () => {
     setTransform(true);
     document.onmousedown = () => {
@@ -82,15 +78,19 @@ function sum(b: number) {
     };
   };
 
-  // Starts dragging the box
+  const disableTransform = () => {
+    setTransform(false);
+  };
+
+  // Box dragging
   const handleMouseDown = getDraggingHandler(
     (incrementX, incrementY) => {
       let newLeft = ref.current!.offsetLeft - incrementX;
       let newTop = ref.current!.offsetTop - incrementY;
 
+      // To disable dragging beyond the page boundaries
       if (newLeft < 0) newLeft = 0;
       if (newTop < 0) newTop = 0;
-
       // TODO: Get board size to use here
       //if(newLeft + data.width > BOARD_WIDTH) newLeft = BOARD_WIDTH - data.width;
       //if(newTop + data.height > BOARD_HEIGHT) newTop = BOARD_HEIGHT - data.height;
@@ -139,12 +139,30 @@ function sum(b: number) {
     enableTransform();
   };
 
-  const handleTopLeftResize = getDraggingHandler(
-    (incrementX, incrementY) => {
-      const newWidth = ref.current!.clientWidth + incrementX;
-      const newHeight = ref.current!.clientHeight + incrementY;
-      const newLeft = ref.current!.offsetLeft - incrementX;
-      const newTop = ref.current!.offsetTop - incrementY;
+  const handleResize = getDraggingHandler(
+    (incrementX, incrementY, corner) => {
+      let newWidth = 0,
+        newHeight = 0,
+        newLeft = ref.current!.offsetLeft,
+        newTop = ref.current!.offsetTop;
+
+      if (corner === 'top-left') {
+        newWidth = ref.current!.clientWidth + incrementX;
+        newHeight = ref.current!.clientHeight + incrementY;
+        newLeft = ref.current!.offsetLeft - incrementX;
+        newTop = ref.current!.offsetTop - incrementY;
+      } else if (corner === 'top-right') {
+        newWidth = ref.current!.clientWidth - incrementX;
+        newHeight = ref.current!.clientHeight + incrementY;
+        newTop = ref.current!.offsetTop - incrementY;
+      } else if (corner === 'bottom-left') {
+        newWidth = ref.current!.clientWidth + incrementX;
+        newHeight = ref.current!.clientHeight - incrementY;
+        newLeft = ref.current!.offsetLeft - incrementX;
+      } else if (corner === 'bottom-right') {
+        newWidth = ref.current!.clientWidth - incrementX;
+        newHeight = ref.current!.clientHeight - incrementY;
+      }
 
       setData({
         ...data,
@@ -152,55 +170,6 @@ function sum(b: number) {
         height: newHeight,
         left: newLeft,
         top: newTop,
-      });
-    },
-    onStartResizingCallback,
-    onStopResizingCallback
-  );
-
-  const handleTopRightResize = getDraggingHandler(
-    (incrementX, incrementY) => {
-      const newWidth = ref.current!.clientWidth - incrementX;
-      const newHeight = ref.current!.clientHeight + incrementY;
-      const newTop = ref.current!.offsetTop - incrementY;
-
-      setData({
-        ...data,
-        width: newWidth,
-        height: newHeight,
-        top: newTop,
-      });
-    },
-    onStartResizingCallback,
-    onStopResizingCallback
-  );
-
-  const handleBottomLeftResize = getDraggingHandler(
-    (incrementX, incrementY) => {
-      const newWidth = ref.current!.clientWidth + incrementX;
-      const newHeight = ref.current!.clientHeight - incrementY;
-      const newLeft = ref.current!.offsetLeft - incrementX;
-
-      setData({
-        ...data,
-        width: newWidth,
-        height: newHeight,
-        left: newLeft,
-      });
-    },
-    onStartResizingCallback,
-    onStopResizingCallback
-  );
-
-  const handleBottomRightResize = getDraggingHandler(
-    (incrementX, incrementY) => {
-      const newWidth = ref.current!.clientWidth - incrementX;
-      const newHeight = ref.current!.clientHeight - incrementY;
-
-      setData({
-        ...data,
-        width: newWidth,
-        height: newHeight,
       });
     },
     onStartResizingCallback,
@@ -226,9 +195,6 @@ function sum(b: number) {
         width: `${data.width}px`,
         height: `${data.height}px`,
       }}
-      // onMouseEnter={() => setHovering(true)}
-      // onMouseLeave={() => setHovering(false)}
-      // onClick={(e) => e.stopPropagation()}
     >
       {/* <AnimatePresence initial={false}>
         {isHovering ? (
@@ -268,21 +234,13 @@ function sum(b: number) {
         )}
         onDoubleClick={(e) => {
           e.stopPropagation();
-          // document.getElementById(titleId)?.focus();
-          // disableTransform();
         }}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
       ></div>
 
       {/* Transform controls wrapper */}
-      <TransformControls
-        enabled={isTransformEnabled}
-        onResizeTopLeft={handleTopLeftResize}
-        onResizeTopRight={handleTopRightResize}
-        onResizeBottomLeft={handleBottomLeftResize}
-        onResizeBottomRight={handleBottomRightResize}
-      />
+      <TransformControls enabled={isTransformEnabled} onResize={handleResize} />
 
       <div
         className={clsx(
