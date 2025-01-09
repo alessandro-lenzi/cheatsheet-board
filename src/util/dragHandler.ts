@@ -10,13 +10,13 @@ export const getDraggingHandler: (
   onStart?: () => void,
   onStop?: () => void
 ) => MouseEventHandler<HTMLDivElement> = (updateCallback, onStart, onStop) => {
-  return (e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  return (event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (onStart) onStart();
 
-    prevX = e.clientX;
-    prevY = e.clientY;
+    prevX = event.clientX;
+    prevY = event.clientY;
 
     document.onmouseup = () => {
       document.onmouseup = null;
@@ -24,18 +24,18 @@ export const getDraggingHandler: (
       if (onStop) onStop();
     };
 
-    document.onmousemove = (e) => {
-      e.preventDefault();
+    document.onmousemove = (moveEvent) => {
+      moveEvent.preventDefault();
 
-      const incrementX = prevX - e.clientX;
-      const incrementY = prevY - e.clientY;
-      const truncX = e.shiftKey ? incrementX % 16 : 0;
-      const truncY = e.shiftKey ? incrementY % 16 : 0;
+      const incrementX = prevX - moveEvent.clientX;
+      const incrementY = prevY - moveEvent.clientY;
+      const truncX = moveEvent.shiftKey ? incrementX % 16 : 0;
+      const truncY = moveEvent.shiftKey ? incrementY % 16 : 0;
 
       updateCallback(incrementX - truncX, incrementY - truncY);
 
-      prevX = e.clientX + truncX;
-      prevY = e.clientY + truncY;
+      prevX = moveEvent.clientX + truncX;
+      prevY = moveEvent.clientY + truncY;
     };
   };
 };

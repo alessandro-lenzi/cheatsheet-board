@@ -6,6 +6,7 @@ import {
   useState,
   useRef,
   useId,
+  MouseEvent,
 } from 'react';
 
 import clsx from 'clsx';
@@ -13,6 +14,7 @@ import { motion } from 'motion/react';
 
 import { CodeEditor } from '../CodeEditor';
 import { getDraggingHandler } from '@/util/dragHandler';
+import { TransformControls } from './TransformControls';
 
 export interface BoardItemProps {
   x: number;
@@ -48,10 +50,14 @@ function sum(b: number) {
     color: '#464f6f',
   });
 
+  const ref = useRef<HTMLDivElement>(null);
   const titleId = useId();
 
   const [isTransformEnabled, setTransform] = useState(false);
-  // const [isHovering, setHovering] = useState(false);
+  const [isFocused, setFocused] = useState(false);
+
+  const [mouseDownAt, setMouseDownAt] = useState(0);
+  const [mouseUpAt, setMouseUpAt] = useState(0);
 
   const handleTitleChange: ChangeEventHandler<HTMLInputElement> = (
     event: ChangeEvent<HTMLInputElement>
@@ -59,11 +65,9 @@ function sum(b: number) {
     setData({ ...data, title: event.target.value });
   };
 
-  // const handleContentChange: ChangeEventHandler<HTMLTextAreaElement> = (
-  //   event: ChangeEvent<HTMLTextAreaElement>
-  // ) => {
-  //   setData({ ...data, content: event.target.value });
-  // };
+  const handleContentChange = (value: string) => {
+    setData({ ...data, content: value });
+  };
 
   const disableTransform = () => {
     setTransform(false);
@@ -74,16 +78,22 @@ function sum(b: number) {
     document.onmousedown = () => {
       document.onmousedown = null;
       setTransform(false);
+      setFocused(false);
     };
   };
 
-  const [mouseDownAt, setMouseDownAt] = useState(0);
-  const [mouseUpAt, setMouseUpAt] = useState(0);
-
-  const startDragging = getDraggingHandler(
+  // Starts dragging the box
+  const handleMouseDown = getDraggingHandler(
     (incrementX, incrementY) => {
-      const newLeft = ref.current!.offsetLeft - incrementX;
-      const newTop = ref.current!.offsetTop - incrementY;
+      let newLeft = ref.current!.offsetLeft - incrementX;
+      let newTop = ref.current!.offsetTop - incrementY;
+
+      if (newLeft < 0) newLeft = 0;
+      if (newTop < 0) newTop = 0;
+
+      // TODO: Get board size to use here
+      //if(newLeft + data.width > BOARD_WIDTH) newLeft = BOARD_WIDTH - data.width;
+      //if(newTop + data.height > BOARD_HEIGHT) newTop = BOARD_HEIGHT - data.height;
 
       setData({
         ...data,
@@ -92,11 +102,42 @@ function sum(b: number) {
       });
     },
     () => {
-      // to detect a real click (small duration) or a long click that
-      // is probably a dragging movement
+      // onStart event: Called when the mouseUp happens (aka mouseDown)
+      // Sets the mouseDownAt variable to allow detection of click type
       setMouseDownAt(new Date().getTime());
     }
   );
+
+  // Detects simple click (transform mode) or double click (edit mode)
+  const handleMouseUp = (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+
+    const now = new Date().getTime();
+    setMouseUpAt(now);
+    if (now - mouseUpAt < 300) {
+      // This means it's a double click
+      document.getElementById(titleId)?.focus();
+      setFocused(true);
+
+      if (isTransformEnabled) disableTransform();
+      return;
+    }
+
+    if (!isTransformEnabled && now - mouseDownAt < 200) {
+      // This means it's a short click, so it's not a dragging action
+      // but just a click action, and we can enable the transform controls
+      setFocused(true);
+      enableTransform();
+    }
+  };
+
+  const onStartResizingCallback = () => {
+    // onStart: does nothing
+  };
+  const onStopResizingCallback = () => {
+    // onStop resizing: re-enables transform
+    enableTransform();
+  };
 
   const handleTopLeftResize = getDraggingHandler(
     (incrementX, incrementY) => {
@@ -113,8 +154,8 @@ function sum(b: number) {
         top: newTop,
       });
     },
-    () => {},
-    enableTransform
+    onStartResizingCallback,
+    onStopResizingCallback
   );
 
   const handleTopRightResize = getDraggingHandler(
@@ -130,8 +171,8 @@ function sum(b: number) {
         top: newTop,
       });
     },
-    () => {},
-    enableTransform
+    onStartResizingCallback,
+    onStopResizingCallback
   );
 
   const handleBottomLeftResize = getDraggingHandler(
@@ -147,8 +188,8 @@ function sum(b: number) {
         left: newLeft,
       });
     },
-    () => {},
-    enableTransform
+    onStartResizingCallback,
+    onStopResizingCallback
   );
 
   const handleBottomRightResize = getDraggingHandler(
@@ -162,19 +203,19 @@ function sum(b: number) {
         height: newHeight,
       });
     },
-    () => {},
-    enableTransform
+    onStartResizingCallback,
+    onStopResizingCallback
   );
-
-  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <motion.div
       ref={ref}
       className={clsx(
-        'sheet-item group absolute rounded-md focus-within:z-30 focus-within:ring-2',
-        'shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_8px_20px_-6px_rgba(0,0,0,0.3)]'
-        // 'shadow-lg'
+        'sheet-item group absolute rounded-md focus-within:ring-2',
+        'shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_8px_20px_-6px_rgba(0,0,0,0.3)]',
+        {
+          'z-30': isFocused,
+        }
       )}
       initial={{ opacity: 0, scale: 0 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -187,7 +228,7 @@ function sum(b: number) {
       }}
       // onMouseEnter={() => setHovering(true)}
       // onMouseLeave={() => setHovering(false)}
-      onClick={(e) => e.stopPropagation()}
+      // onClick={(e) => e.stopPropagation()}
     >
       {/* <AnimatePresence initial={false}>
         {isHovering ? (
@@ -216,9 +257,9 @@ function sum(b: number) {
         ) : null}
       </AnimatePresence> */}
 
-      <div className="no-print border-gold absolute bottom-0 right-1 z-10 p-1 text-[0.7em] text-slate-500">
+      {/* <div className="no-print border-gold absolute bottom-0 right-1 z-10 p-1 text-[0.7em] text-slate-500">
         W: {data.width} H: {data.height} X: {data.left} Y: {data.top}
-      </div>
+      </div> */}
 
       {/* Focus clickable wrapper */}
       <div
@@ -230,69 +271,19 @@ function sum(b: number) {
           // document.getElementById(titleId)?.focus();
           // disableTransform();
         }}
-        onMouseDown={startDragging}
-        onMouseUp={(e) => {
-          e.stopPropagation();
-
-          const now = new Date().getTime();
-          setMouseUpAt(now);
-          if (now - mouseUpAt < 300) {
-            document.getElementById(titleId)?.focus();
-
-            if (isTransformEnabled) disableTransform();
-            return;
-          }
-
-          if (!isTransformEnabled && now - mouseDownAt < 200) {
-            // This means its a short click, so it's not a dragging action
-            // but just a click action, and we can enable the transform controls
-            enableTransform();
-          }
-        }}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
       ></div>
 
       {/* Transform controls wrapper */}
-      {isTransformEnabled ? (
-        <div
-          className={clsx(
-            'no-print absolute inset-[-6px] z-20 border border-dashed border-slate-400'
-          )}
-        >
-          {/* Top left */}
-          <div
-            onMouseDown={handleTopLeftResize}
-            className={
-              'absolute left-[-5px] top-[-5px] h-[10px] w-[10px] cursor-nw-resize rounded-sm border border-slate-400 bg-white'
-            }
-          ></div>
+      <TransformControls
+        enabled={isTransformEnabled}
+        onResizeTopLeft={handleTopLeftResize}
+        onResizeTopRight={handleTopRightResize}
+        onResizeBottomLeft={handleBottomLeftResize}
+        onResizeBottomRight={handleBottomRightResize}
+      />
 
-          {/* Top right */}
-          <div
-            onMouseDown={handleTopRightResize}
-            className={
-              'absolute right-[-5px] top-[-5px] h-[10px] w-[10px] cursor-ne-resize rounded-sm border border-slate-400 bg-white'
-            }
-          ></div>
-
-          {/* Bottom left */}
-          <div
-            onMouseDown={handleBottomLeftResize}
-            className={
-              'absolute bottom-[-5px] left-[-5px] h-[10px] w-[10px] cursor-sw-resize rounded-sm border border-slate-400 bg-white'
-            }
-          ></div>
-
-          {/* Bottom right */}
-          <div
-            onMouseDown={handleBottomRightResize}
-            className={
-              'absolute bottom-[-5px] right-[-5px] h-[10px] w-[10px] cursor-se-resize rounded-sm border border-slate-400 bg-white'
-            }
-          ></div>
-        </div>
-      ) : null}
-
-      {/* )} */}
       <div
         className={clsx(
           `absolute z-0 flex h-[100%] w-[100%] resize flex-col gap-1 rounded-md border border-black/20 p-1`
@@ -323,7 +314,7 @@ function sum(b: number) {
         <CodeEditor
           language="tsx"
           defaultValue={data.initialContent ?? ''}
-          onChange={(value) => setData({ ...data, content: value })}
+          onChange={handleContentChange}
         />
       </div>
     </motion.div>

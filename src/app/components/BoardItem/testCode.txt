@@ -1,0 +1,38 @@
+React Server Components
+
+// Server-rendered components that execute
+// at build time or per request.
+
+import { db } from './db.ts';
+import { CustomerSelect } from './customerSelect';
+import { createCustomer } from './createCustomer';
+
+// Note the component function is async,
+// indicating it is SSR
+export async function Dashboard() {
+	const customer = db.getCustomers();
+	return (
+		<div>
+			<h1>Dashboard</h1>
+			<CustomerSelector
+				customers={customers}
+				onCreateCustomer={createCustomer}
+			/>
+		</div>
+	);
+}
+
+
+'use server'
+
+// Makes server-side functions callable
+// from client-side code.
+
+'use server'
+
+export async function createCustomer(
+	prevResult,
+	formData
+) {
+	// Saves customer entry on DB
+}
