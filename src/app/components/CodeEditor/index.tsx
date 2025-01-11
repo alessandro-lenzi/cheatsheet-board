@@ -68,7 +68,9 @@ export function CodeEditor({ language, defaultValue, onChange }: IProps) {
       onUpdate={onChange}
       insertSpaces={false}
       lineNumbers={false}
+      wordWrap={true}
       textareaProps={textareaProps}
+      // style={{ fontSize: '16px' }}
       rtl={false}
     >
       {(editor) => <Extensions editor={editor} />}

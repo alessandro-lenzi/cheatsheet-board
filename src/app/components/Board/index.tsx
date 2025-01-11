@@ -9,19 +9,20 @@ import {
   RefObject,
   MouseEvent,
   useState,
-  ReactElement,
 } from 'react';
 import { BoardItem, BoardItemProps } from '../BoardItem';
+import { nextBoxes } from '@/app/testSheets/nextjsSheet';
 
 type IProps = HTMLAttributes<HTMLDivElement> & {
   ref?: RefCallback<HTMLDivElement> | RefObject<HTMLDivElement>;
   children: ReactNode;
 };
 
+const InitialWidth = 200;
+const InitialHeight = 200;
+
 export const Board = ({ ref, children, className, ...props }: IProps) => {
-  const [items, setItems] = useState<ReactElement<BoardItemProps>[]>([
-    <BoardItem key="1" x={256} y={256} />,
-  ]);
+  const [items, setItems] = useState<BoardItemProps[]>(nextBoxes);
 
   function refCallback(element: HTMLDivElement | null) {
     if (!element) return;
@@ -40,13 +41,12 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
       `Creating new board item at X=${event.nativeEvent.layerX} Y=${event.nativeEvent.layerY}`
     );
 
-    const newItem = (
-      <BoardItem
-        key={items.length + 1}
-        x={event.nativeEvent.layerX}
-        y={event.nativeEvent.layerY}
-      />
-    );
+    const newItem = {
+      top: event.nativeEvent.layerX - InitialWidth / 2,
+      left: event.nativeEvent.layerY - InitialHeight / 2,
+      width: InitialWidth,
+      height: InitialHeight,
+    };
 
     setItems([...items, newItem]);
   };
@@ -61,7 +61,9 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
       onDoubleClick={handleDoubleClick}
     >
       {children}
-      {items}
+      {items.map((itemProps, index) => (
+        <BoardItem key={index} {...itemProps} />
+      ))}
     </div>
   );
 };

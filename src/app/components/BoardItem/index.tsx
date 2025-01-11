@@ -16,11 +16,6 @@ import { CodeEditor } from '../CodeEditor';
 import { getDraggingHandler } from '@/util/dragHandler';
 import { TransformControls } from './TransformControls';
 
-export interface BoardItemProps {
-  x: number;
-  y: number;
-}
-
 interface ItemData {
   left: number;
   top: number;
@@ -28,26 +23,21 @@ interface ItemData {
   height: number;
   title?: string;
   content?: string;
-  initialContent: string;
-  color: string;
+  initialContent?: string;
+  color?: string;
 }
 
-const InitialWidth = 200;
-const InitialHeight = 200;
+export type BoardItemProps = Omit<ItemData, 'content'>;
 
-export const BoardItem = ({ x, y }: BoardItemProps) => {
+export const BoardItem = (props: BoardItemProps) => {
   const [data, setData] = useState<ItemData>({
-    left: x - InitialWidth / 2,
-    top: y - InitialHeight / 2,
-    width: InitialWidth,
-    height: InitialHeight,
-    initialContent: `const a = 123;
-
-function sum(b: number) {
-  return \`Sum: \$\{a + b}\`;
-}
-`,
-    color: '#464f6f',
+    left: props.left,
+    top: props.top,
+    width: props.width,
+    height: props.height,
+    title: props.title,
+    initialContent: props.initialContent,
+    color: props.color,
   });
 
   const ref = useRef<HTMLDivElement>(null);
@@ -223,9 +213,9 @@ function sum(b: number) {
         ) : null}
       </AnimatePresence> */}
 
-      {/* <div className="no-print border-gold absolute bottom-0 right-1 z-10 p-1 text-[0.7em] text-slate-500">
+      <div className="no-print border-gold absolute bottom-0 right-1 z-10 p-1 text-[0.6em] text-slate-500">
         W: {data.width} H: {data.height} X: {data.left} Y: {data.top}
-      </div> */}
+      </div>
 
       {/* Focus clickable wrapper */}
       <div
