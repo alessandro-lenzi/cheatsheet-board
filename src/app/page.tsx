@@ -7,6 +7,8 @@ import {
   GitHubLogoIcon,
   LinkedInLogoIcon,
 } from '@radix-ui/react-icons';
+import { CheatSheetContextProvider } from './contexts/cheatsheets';
+import { ExportJsonButton } from './components/ExportJsonButton';
 
 export default function Home() {
   const wrapperId = useId();
@@ -26,18 +28,25 @@ export default function Home() {
         dotColor="#00000011"
       /> */}
 
-      <main className="row-start-2 flex flex-1 flex-col justify-center gap-8 sm:items-start">
-        <Board id={boardId} className="h-[210mm] w-[297mm]">
-          <GridBackground
-            elementId={boardId}
-            size={16}
-            stops={4}
-            primaryColor={'#00000033'}
-            secondaryColor={'#00000011'}
-            dotColor={'#0000000f'}
-          />
-        </Board>
-      </main>
+      <CheatSheetContextProvider>
+        <main className="flex flex-1 flex-row justify-center gap-8">
+          <div className="align-center flex flex-1 flex-row items-center justify-center">
+            <Board id={boardId} className="h-[210mm] w-[297mm]">
+              <GridBackground
+                elementId={boardId}
+                size={16}
+                stops={4}
+                primaryColor={'#00000033'}
+                secondaryColor={'#00000011'}
+                dotColor={'#0000000f'}
+              />
+            </Board>
+          </div>
+          <div className="flex flex-1 flex-col pt-10">
+            <ExportJsonButton />
+          </div>
+        </main>
+      </CheatSheetContextProvider>
       <footer className="no-print flex flex-wrap items-center justify-center justify-items-center gap-6 text-[0.8em] text-slate-700">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"

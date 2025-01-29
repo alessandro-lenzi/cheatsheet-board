@@ -15,22 +15,15 @@ import { motion } from 'motion/react';
 import { CodeEditor } from '../CodeEditor';
 import { getDraggingHandler } from '@/util/dragHandler';
 import { TransformControls } from './TransformControls';
-
-interface ItemData {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  title?: string;
-  content?: string;
-  initialContent?: string;
-  color?: string;
-}
+import { ItemData, useCheatSheetContext } from '@/app/contexts/cheatsheets';
 
 export type BoardItemProps = Omit<ItemData, 'content'>;
 
 export const BoardItem = (props: BoardItemProps) => {
+  const { updateItem } = useCheatSheetContext();
+
   const [data, setData] = useState<ItemData>({
+    id: props.id,
     left: props.left,
     top: props.top,
     width: props.width,
@@ -49,14 +42,21 @@ export const BoardItem = (props: BoardItemProps) => {
   const [mouseDownAt, setMouseDownAt] = useState(0);
   const [mouseUpAt, setMouseUpAt] = useState(0);
 
+  const update = (newData: ItemData) => {
+    setData(newData);
+    updateItem(newData);
+  };
+
   const handleTitleChange: ChangeEventHandler<HTMLInputElement> = (
     event: ChangeEvent<HTMLInputElement>
   ) => {
-    setData({ ...data, title: event.target.value });
+    const newData = { ...data, title: event.target.value };
+    update(newData);
   };
 
   const handleContentChange = (value: string) => {
-    setData({ ...data, content: value });
+    const newData = { ...data, content: value };
+    update(newData);
   };
 
   const enableTransform = () => {
@@ -85,7 +85,7 @@ export const BoardItem = (props: BoardItemProps) => {
       //if(newLeft + data.width > BOARD_WIDTH) newLeft = BOARD_WIDTH - data.width;
       //if(newTop + data.height > BOARD_HEIGHT) newTop = BOARD_HEIGHT - data.height;
 
-      setData({
+      update({
         ...data,
         left: newLeft,
         top: newTop,
@@ -154,7 +154,7 @@ export const BoardItem = (props: BoardItemProps) => {
         newHeight = ref.current!.clientHeight - incrementY;
       }
 
-      setData({
+      update({
         ...data,
         width: newWidth,
         height: newHeight,

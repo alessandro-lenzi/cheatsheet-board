@@ -8,10 +8,11 @@ import {
   RefCallback,
   RefObject,
   MouseEvent,
-  useState,
+  useEffect,
 } from 'react';
-import { BoardItem, BoardItemProps } from '../BoardItem';
-import { nextBoxes } from '@/app/testSheets/nextjsSheet';
+import { BoardItem } from '../BoardItem';
+// import { boxes } from '@/app/testSheets/redux';
+import { useCheatSheetContext } from '@/app/contexts/cheatsheets';
 
 type IProps = HTMLAttributes<HTMLDivElement> & {
   ref?: RefCallback<HTMLDivElement> | RefObject<HTMLDivElement>;
@@ -22,7 +23,8 @@ const InitialWidth = 200;
 const InitialHeight = 200;
 
 export const Board = ({ ref, children, className, ...props }: IProps) => {
-  const [items, setItems] = useState<BoardItemProps[]>(nextBoxes);
+  // const [items, setItems] = useState<BoardItemProps[]>(boxes);
+  const { items, createItem } = useCheatSheetContext();
 
   function refCallback(element: HTMLDivElement | null) {
     if (!element) return;
@@ -42,14 +44,19 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
     );
 
     const newItem = {
-      top: event.nativeEvent.layerX - InitialWidth / 2,
-      left: event.nativeEvent.layerY - InitialHeight / 2,
+      top: event.nativeEvent.layerY - InitialWidth / 2,
+      left: event.nativeEvent.layerX - InitialHeight / 2,
       width: InitialWidth,
       height: InitialHeight,
     };
 
-    setItems([...items, newItem]);
+    // setItems([...items, newItem]);
+    createItem(newItem);
   };
+
+  useEffect(() => {
+    console.log(`context items changed`, items);
+  }, [items]);
 
   return (
     <div
@@ -61,8 +68,8 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
       onDoubleClick={handleDoubleClick}
     >
       {children}
-      {items.map((itemProps, index) => (
-        <BoardItem key={index} {...itemProps} />
+      {items.map((itemProps) => (
+        <BoardItem key={itemProps.id} {...itemProps} />
       ))}
     </div>
   );
