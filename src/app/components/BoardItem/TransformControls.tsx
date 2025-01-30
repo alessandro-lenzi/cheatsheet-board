@@ -2,20 +2,24 @@
 
 import clsx from 'clsx';
 import { DragHandlerCallback } from '@/util/dragHandler';
+import { KeyboardEventHandler } from 'react';
 
 interface IProps {
   enabled: boolean;
   onResize: DragHandlerCallback;
+  onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
 }
 
-export const TransformControls = ({ enabled, onResize }: IProps) => {
+export const TransformControls = ({ enabled, onResize, onKeyDown }: IProps) => {
   const handlerClassName =
     'absolute h-[14px] w-[14px] rounded-sm border-2 border-slate-400 bg-white';
   return enabled ? (
     <div
+      tabIndex={0}
       className={clsx(
         'no-print absolute inset-[-6px] z-50 border-2 border-dashed border-slate-400'
       )}
+      onKeyDown={onKeyDown}
     >
       {/* Top left */}
       <div

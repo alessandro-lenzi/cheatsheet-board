@@ -1,6 +1,6 @@
 'use client';
 import { GridBackground } from '@/app/components/GridBackground';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { Board } from './components/Board';
 import {
   ExternalLinkIcon,
@@ -9,10 +9,38 @@ import {
 } from '@radix-ui/react-icons';
 import { CheatSheetContextProvider } from './contexts/cheatsheets';
 import { ExportJsonButton } from './components/ExportJsonButton';
+import { Card, Select, Text } from '@radix-ui/themes';
+
+interface PageTypeOptions {
+  [k: string]: {
+    description: string;
+    width: string;
+    height: string;
+  };
+}
+
+const PageTypes: PageTypeOptions = {
+  'a4-landscape': {
+    description: 'A4 - Landscape',
+    width: '297mm',
+    height: '210mm',
+  },
+  'a4-portrait': {
+    description: 'A4 - Portrait',
+    width: '210mm',
+    height: '297mm',
+  },
+};
 
 export default function Home() {
   const wrapperId = useId();
   const boardId = useId();
+  const [pageType, setPageType] =
+    useState<keyof PageTypeOptions>('a4-landscape');
+
+  const handlePageChange = (value: string) => {
+    setPageType(value);
+  };
 
   return (
     <div
@@ -31,7 +59,13 @@ export default function Home() {
       <CheatSheetContextProvider>
         <main className="flex flex-1 flex-row justify-center gap-8">
           <div className="align-center flex flex-1 flex-row items-center justify-center">
-            <Board id={boardId} className="h-[210mm] w-[297mm]">
+            <Board
+              id={boardId}
+              style={{
+                width: PageTypes[pageType].width,
+                height: PageTypes[pageType].height,
+              }}
+            >
               <GridBackground
                 elementId={boardId}
                 size={16}
@@ -42,8 +76,31 @@ export default function Home() {
               />
             </Board>
           </div>
-          <div className="flex flex-1 flex-col pt-10">
-            <ExportJsonButton />
+          <div className="no-print flex flex-1 flex-col pt-10">
+            <Card className="min-w-[250px] shadow-lg">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-row items-center gap-2">
+                  <Text as="label" size="1">
+                    Page configuration
+                  </Text>
+                  <Select.Root
+                    size="1"
+                    defaultValue="a4-landscape"
+                    onValueChange={handlePageChange}
+                  >
+                    <Select.Trigger variant="surface" />
+                    <Select.Content>
+                      {Object.entries(PageTypes).map(([key, value]) => (
+                        <Select.Item key={key} value={key}>
+                          {value.description}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+                <ExportJsonButton />
+              </div>
+            </Card>
           </div>
         </main>
       </CheatSheetContextProvider>

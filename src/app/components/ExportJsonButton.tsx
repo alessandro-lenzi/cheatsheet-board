@@ -1,4 +1,4 @@
-import { Button } from '@headlessui/react';
+import { Button } from '@radix-ui/themes';
 import { useCheatSheetContext } from '../contexts/cheatsheets';
 
 export const ExportJsonButton = () => {
@@ -12,7 +12,8 @@ export const ExportJsonButton = () => {
 
   return (
     <Button
-      className="rounded bg-sky-600 px-4 py-2 text-sm text-white data-[active]:bg-sky-700 data-[hover]:bg-sky-500"
+      variant="soft"
+      // className="rounded bg-zinc-600 px-4 py-2 text-sm text-white transition-colors data-[active]:bg-zinc-700 data-[hover]:bg-zinc-500"
       onClick={handleClick}
     >
       Export JSON

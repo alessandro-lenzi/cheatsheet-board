@@ -7,6 +7,8 @@ import {
   useRef,
   useId,
   MouseEvent,
+  KeyboardEventHandler,
+  KeyboardEvent,
 } from 'react';
 
 import clsx from 'clsx';
@@ -166,6 +168,12 @@ export const BoardItem = (props: BoardItemProps) => {
     onStopResizingCallback
   );
 
+  const handleKeyPress: KeyboardEventHandler<HTMLDivElement> = (
+    e: KeyboardEvent<HTMLDivElement>
+  ) => {
+    console.log(e.key);
+  };
+
   return (
     <motion.div
       ref={ref}
@@ -230,7 +238,11 @@ export const BoardItem = (props: BoardItemProps) => {
       ></div>
 
       {/* Transform controls wrapper */}
-      <TransformControls enabled={isTransformEnabled} onResize={handleResize} />
+      <TransformControls
+        enabled={isTransformEnabled}
+        onResize={handleResize}
+        onKeyDown={handleKeyPress}
+      />
 
       <div
         className={clsx(

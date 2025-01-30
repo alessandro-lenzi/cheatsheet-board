@@ -1,5 +1,6 @@
 import { randomSid } from '@/util/random';
 import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
+import { boxes } from '../testSheets/stateful-stateless';
 
 export interface ItemData {
   id: string;
@@ -38,7 +39,7 @@ export const CheatSheetContextProvider = ({
   debug = false,
   children,
 }: CheatSheetContextProviderProps) => {
-  const [items, setItems] = useState<ItemData[]>([]);
+  const [items, setItems] = useState<ItemData[]>(boxes);
 
   const createItem = (item: Omit<ItemData, 'id'>) => {
     const newEntry = {

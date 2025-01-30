@@ -8,10 +8,8 @@ import {
   RefCallback,
   RefObject,
   MouseEvent,
-  useEffect,
 } from 'react';
 import { BoardItem } from '../BoardItem';
-// import { boxes } from '@/app/testSheets/redux';
 import { useCheatSheetContext } from '@/app/contexts/cheatsheets';
 
 type IProps = HTMLAttributes<HTMLDivElement> & {
@@ -23,7 +21,6 @@ const InitialWidth = 200;
 const InitialHeight = 200;
 
 export const Board = ({ ref, children, className, ...props }: IProps) => {
-  // const [items, setItems] = useState<BoardItemProps[]>(boxes);
   const { items, createItem } = useCheatSheetContext();
 
   function refCallback(element: HTMLDivElement | null) {
@@ -50,13 +47,8 @@ export const Board = ({ ref, children, className, ...props }: IProps) => {
       height: InitialHeight,
     };
 
-    // setItems([...items, newItem]);
     createItem(newItem);
   };
-
-  useEffect(() => {
-    console.log(`context items changed`, items);
-  }, [items]);
 
   return (
     <div
